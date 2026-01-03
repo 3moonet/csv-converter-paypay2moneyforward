@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { Download } from "lucide-react";
+import type { CSVText } from "./types/csv";
 import { MESSAGES } from "./constants/filterRules";
 import { filterCSVData } from "./utils/csvFilter";
 import { downloadCSV } from "./utils/csvDownload";
 import { readFileAsText } from "./utils/fileReader";
 
 export default function CSVFilter() {
-  const [csvData, setCsvData] = useState("");
-  const [filteredData, setFilteredData] = useState("");
+  const [csvData, setCsvData] = useState<CSVText>("");
+  const [filteredData, setFilteredData] = useState<CSVText>("");
   const [message, setMessage] = useState("");
   const [isDownloading, setIsDownloading] = useState(false);
 

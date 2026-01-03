@@ -1,3 +1,5 @@
+import type { CSVText } from "../types/csv";
+
 const FILTER_RULES = {
   EXCLUDE_PATTERNS: ["PayPayポイント運用", "PayPay残高"] as const,
   OUTGOING_COLUMN_INDEX: 1,
@@ -7,7 +9,7 @@ const FILTER_RULES = {
 type FilterResult =
   | {
       type: "success";
-      filteredCSV: string;
+      filteredCSV: CSVText;
       filteredCount: number;
       originalCount: number;
     }
@@ -15,7 +17,7 @@ type FilterResult =
       type: "error";
     };
 
-export function filterCSVData(csvData: string): FilterResult {
+export function filterCSVData(csvData: CSVText): FilterResult {
   const lines = csvData.split("\n").filter((line) => line.trim());
 
   if (lines.length < 1) {

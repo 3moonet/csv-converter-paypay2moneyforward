@@ -1,3 +1,5 @@
+import type { CSVText } from "../types/csv";
+
 const DOWNLOAD_CONFIG = {
   FILENAME: "filtered_transactions.csv",
   BOM: "\uFEFF",
@@ -12,7 +14,7 @@ type DownloadResult =
       type: "error";
     };
 
-function createBlobWithBOM(csvData: string): Blob {
+function createBlobWithBOM(csvData: CSVText): Blob {
   const csvWithBOM = DOWNLOAD_CONFIG.BOM + csvData;
   return new Blob([csvWithBOM], { type: DOWNLOAD_CONFIG.MIME_TYPE });
 }
@@ -32,7 +34,7 @@ function triggerDownload(link: HTMLAnchorElement, url: string): void {
   URL.revokeObjectURL(url);
 }
 
-export function downloadCSV(csvData: string): DownloadResult {
+export function downloadCSV(csvData: CSVText): DownloadResult {
   if (!csvData.trim()) {
     return {
       type: "error",

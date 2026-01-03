@@ -1,7 +1,9 @@
+import type { CSVText } from "../types/csv";
+
 type ReadFileResult =
   | {
       type: "success";
-      content: string;
+      content: CSVText;
     }
   | {
       type: "error";
