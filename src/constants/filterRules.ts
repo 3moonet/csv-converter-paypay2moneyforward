@@ -15,10 +15,3 @@ export const MESSAGES = {
     ERROR: "ダウンロードエラーが発生しました",
   },
 } as const;
-
-export const DOWNLOAD_CONFIG = {
-  FILENAME: "filtered_transactions.csv",
-  BOM: "\uFEFF",
-  MIME_TYPE: "text/csv;charset=utf-8;",
-  CLICK_DELAY: 100,
-} as const;

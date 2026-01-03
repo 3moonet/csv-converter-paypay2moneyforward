@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Download } from "lucide-react";
-import { MESSAGES, DOWNLOAD_CONFIG } from "./constants/filterRules";
+import { MESSAGES } from "./constants/filterRules";
 import { filterCSVData } from "./utils/csvFilter";
+import { downloadCSV } from "./utils/csvDownload";
 
 export default function CSVFilter() {
   const [csvData, setCsvData] = useState("");
@@ -43,36 +44,23 @@ export default function CSVFilter() {
     setMessage(MESSAGES.FILTER.SUCCESS(result.filteredCount));
   };
 
-  const downloadCSV = () => {
+  const handleDownload = () => {
     if (!filteredData.trim()) {
       setMessage(MESSAGES.DOWNLOAD.NO_FILTERED_DATA);
       return;
     }
 
     setIsDownloading(true);
-    try {
-      const csvWithBOM = DOWNLOAD_CONFIG.BOM + filteredData;
-      const blob = new Blob([csvWithBOM], { type: DOWNLOAD_CONFIG.MIME_TYPE });
+    const result = downloadCSV(filteredData);
 
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.setAttribute("href", url);
-      link.setAttribute("download", DOWNLOAD_CONFIG.FILENAME);
-      link.style.visibility = "hidden";
-
-      document.body.appendChild(link);
-
-      setTimeout(() => {
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-        setMessage(MESSAGES.DOWNLOAD.STARTED);
-        setIsDownloading(false);
-      }, DOWNLOAD_CONFIG.CLICK_DELAY);
-    } catch {
+    if (result.type === "error") {
       setMessage(MESSAGES.DOWNLOAD.ERROR);
       setIsDownloading(false);
+      return;
     }
+
+    setMessage(MESSAGES.DOWNLOAD.STARTED);
+    setIsDownloading(false);
   };
 
   return (
@@ -110,7 +98,7 @@ export default function CSVFilter() {
         {/* ダウンロードボタン */}
         {filteredData && (
           <button
-            onClick={downloadCSV}
+            onClick={handleDownload}
             disabled={isDownloading}
             className="w-full bg-green-600 hover:bg-green-700 active:bg-green-800 disabled:bg-gray-400 text-white font-bold py-2 px-4 rounded-md transition flex items-center justify-center gap-2"
           >
