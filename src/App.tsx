@@ -3,6 +3,7 @@ import { Download } from "lucide-react";
 import { MESSAGES } from "./constants/filterRules";
 import { filterCSVData } from "./utils/csvFilter";
 import { downloadCSV } from "./utils/csvDownload";
+import { readFileAsText } from "./utils/fileReader";
 
 export default function CSVFilter() {
   const [csvData, setCsvData] = useState("");
@@ -10,21 +11,23 @@ export default function CSVFilter() {
   const [message, setMessage] = useState("");
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const text = e.target?.result;
-        if (typeof text === "string") {
-          setCsvData(text);
-          setMessage(MESSAGES.FILE.LOADED);
-        } else {
-          setMessage(MESSAGES.FILE.LOAD_ERROR);
-        }
-      };
-      reader.readAsText(file, "utf-8");
+    if (!file) {
+      return;
     }
+
+    const result = await readFileAsText(file);
+
+    if (result.type === "error") {
+      setMessage(MESSAGES.FILE.LOAD_ERROR);
+      return;
+    }
+
+    setCsvData(result.content);
+    setMessage(MESSAGES.FILE.LOADED);
   };
 
   const filterCSV = () => {
