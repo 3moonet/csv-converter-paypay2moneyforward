@@ -1,5 +1,10 @@
 import { useState } from "react";
 import { Download } from "lucide-react";
+import {
+  FILTER_RULES,
+  MESSAGES,
+  DOWNLOAD_CONFIG,
+} from "./constants/filterRules";
 
 export default function CSVFilter() {
   const [csvData, setCsvData] = useState("");
@@ -15,9 +20,9 @@ export default function CSVFilter() {
         const text = e.target?.result;
         if (typeof text === "string") {
           setCsvData(text);
-          setMessage("ファイルを読み込みました");
+          setMessage(MESSAGES.FILE.LOADED);
         } else {
-          setMessage("ファイルを読み込めませんでした");
+          setMessage(MESSAGES.FILE.LOAD_ERROR);
         }
       };
       reader.readAsText(file, "utf-8");
@@ -26,7 +31,7 @@ export default function CSVFilter() {
 
   const filterCSV = () => {
     if (!csvData.trim()) {
-      setMessage("CSVファイルをアップロードしてください");
+      setMessage(MESSAGES.FILTER.NO_FILE);
       return;
     }
 
@@ -34,7 +39,7 @@ export default function CSVFilter() {
       const lines = csvData.split("\n").filter((line) => line.trim());
 
       if (lines.length < 1) {
-        setMessage("データが不足しています");
+        setMessage(MESSAGES.FILTER.INSUFFICIENT_DATA);
         return;
       }
 
@@ -42,39 +47,40 @@ export default function CSVFilter() {
       const dataLines = lines.slice(1);
 
       const filteredLines = dataLines.filter((line) => {
+        const columns = line.split(",");
+        const outgoingValue = columns[FILTER_RULES.OUTGOING_COLUMN_INDEX];
         const hasOutgoing =
-          line.split(",")[1] &&
-          line.split(",")[1].trim() !== "-" &&
-          line.split(",")[1].trim() !== "";
-        const isNotPointInvestment = !line.includes("PayPayポイント運用");
-        const isNotPayPayBalance = !line.includes("PayPay残高");
-        return hasOutgoing && isNotPointInvestment && isNotPayPayBalance;
+          outgoingValue &&
+          !FILTER_RULES.EMPTY_VALUES.includes(outgoingValue.trim());
+        const isNotExcluded = !FILTER_RULES.EXCLUDE_PATTERNS.some((pattern) =>
+          line.includes(pattern)
+        );
+        return hasOutgoing && isNotExcluded;
       });
 
       const result = [headers, ...filteredLines].join("\n");
       setFilteredData(result);
-      setMessage(`✓ フィルタリング完了: ${filteredLines.length}行抽出`);
+      setMessage(MESSAGES.FILTER.SUCCESS(filteredLines.length));
     } catch {
-      setMessage("エラーが発生しました");
+      setMessage(MESSAGES.FILTER.ERROR);
     }
   };
 
   const downloadCSV = () => {
     if (!filteredData.trim()) {
-      setMessage("まずフィルタリングを実行してください");
+      setMessage(MESSAGES.DOWNLOAD.NO_FILTERED_DATA);
       return;
     }
 
     setIsDownloading(true);
     try {
-      const BOM = "\uFEFF";
-      const csvWithBOM = BOM + filteredData;
-      const blob = new Blob([csvWithBOM], { type: "text/csv;charset=utf-8;" });
+      const csvWithBOM = DOWNLOAD_CONFIG.BOM + filteredData;
+      const blob = new Blob([csvWithBOM], { type: DOWNLOAD_CONFIG.MIME_TYPE });
 
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.setAttribute("href", url);
-      link.setAttribute("download", "filtered_transactions.csv");
+      link.setAttribute("download", DOWNLOAD_CONFIG.FILENAME);
       link.style.visibility = "hidden";
 
       document.body.appendChild(link);
@@ -83,11 +89,11 @@ export default function CSVFilter() {
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
-        setMessage("✓ ダウンロード開始しました");
+        setMessage(MESSAGES.DOWNLOAD.STARTED);
         setIsDownloading(false);
-      }, 100);
+      }, DOWNLOAD_CONFIG.CLICK_DELAY);
     } catch {
-      setMessage("ダウンロードエラーが発生しました");
+      setMessage(MESSAGES.DOWNLOAD.ERROR);
       setIsDownloading(false);
     }
   };
