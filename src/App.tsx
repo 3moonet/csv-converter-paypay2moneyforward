@@ -1,97 +1,33 @@
-import { Download } from "lucide-react";
 import { MessageContextProvider } from "./contexts/MessageContext/provider";
-import { useMessage } from "./contexts/MessageContext/hooks";
 import { useFileUpload } from "./hooks/useFileUpload";
 import { useCSVFilter } from "./hooks/useCSVFilter";
-import { useCSVDownload } from "./hooks/useCSVDownload";
+import { FileUpload } from "./components/FileUpload";
+import { FilterButton } from "./components/FilterButton";
+import { DownloadButton } from "./components/DownloadButton";
+import { MessageDisplay } from "./components/MessageDisplay";
+import { Statistics } from "./components/Statistics";
+import { FilterInfo } from "./components/FilterInfo";
 
 function CSVFilterContent() {
   const { csvData, handleFileUpload } = useFileUpload();
   const { filteredData, filter } = useCSVFilter(csvData);
-  const { isDownloading, download } = useCSVDownload();
-  const { message } = useMessage();
 
   return (
     <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 p-4 flex items-center justify-center">
       <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-6 space-y-6">
-        {/* タイトル */}
         <h1 className="text-2xl font-bold text-gray-800">CSV フィルター</h1>
 
-        {/* ファイルアップロード */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-3">
-            CSVファイルをアップロード
-          </label>
-          <input
-            type="file"
-            accept=".csv"
-            onChange={handleFileUpload}
-            className="w-full text-sm text-gray-600 file:py-2 file:px-3 file:rounded-md file:border-0 file:bg-blue-100 file:text-blue-700 file:font-semibold cursor-pointer"
-          />
-        </div>
+        <FileUpload onFileUpload={handleFileUpload} />
 
-        {/* フィルタリングボタン */}
-        <button
-          onClick={filter}
-          disabled={!csvData.trim()}
-          className={`w-full font-bold py-2 px-4 rounded-md transition ${
-            csvData.trim()
-              ? "bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed"
-          }`}
-        >
-          フィルタリング実行
-        </button>
+        <FilterButton onClick={filter} disabled={!csvData.trim()} />
 
-        {/* ダウンロードボタン */}
-        {filteredData && (
-          <button
-            onClick={() => download(filteredData)}
-            disabled={isDownloading}
-            className="w-full bg-green-600 hover:bg-green-700 active:bg-green-800 disabled:bg-gray-400 text-white font-bold py-2 px-4 rounded-md transition flex items-center justify-center gap-2"
-          >
-            <Download size={18} />
-            {isDownloading ? "ダウンロード中..." : "CSVをダウンロード"}
-          </button>
-        )}
+        {filteredData && <DownloadButton filteredData={filteredData} />}
 
-        {/* メッセージ */}
-        {message && (
-          <div
-            className={`p-3 rounded-md text-sm font-medium text-center ${
-              message.includes("✓")
-                ? "bg-green-100 text-green-800 border border-green-300"
-                : "bg-blue-100 text-blue-800 border border-blue-300"
-            }`}
-          >
-            {message}
-          </div>
-        )}
+        <MessageDisplay />
 
-        {/* 統計 */}
-        {csvData && (
-          <div className="bg-gray-50 p-3 rounded-md text-xs text-gray-600">
-            <p>
-              入力: {csvData.split("\n").filter((l) => l.trim()).length - 1} 行
-            </p>
-            {filteredData && (
-              <p>
-                出力:{" "}
-                {filteredData.split("\n").filter((l) => l.trim()).length - 1} 行
-              </p>
-            )}
-          </div>
-        )}
+        <Statistics csvData={csvData} filteredData={filteredData} />
 
-        {/* 除外される行の説明 */}
-        <div className="bg-gray-50 p-3 rounded-md text-xs text-gray-600 space-y-1">
-          <p className="font-semibold text-gray-800">除外される行:</p>
-          <ul className="space-y-0.5 ml-2">
-            <li>• 入金金額がある行（支出でない）</li>
-            <li>• PayPayポイント運用の行</li>
-            <li>• PayPay残高の取引</li>
-          </ul>
-        </div>
+        <FilterInfo />
       </div>
     </div>
   );
