@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { CSVText } from "../types/csv";
+import { useMessage } from "../contexts/MessageContext/hooks";
 
 const FILTER_RULES = {
   EXCLUDE_PATTERNS: ["PayPayポイント運用", "PayPay残高"] as const,
@@ -7,22 +8,8 @@ const FILTER_RULES = {
   EMPTY_VALUES: ["-", ""] as readonly string[],
 } as const;
 
-type FilterResult =
-  | {
-      type: "success";
-      filteredCSV: CSVText;
-    }
-  | {
-      type: "error";
-    };
-
-function filterCSVData(csvData: CSVText): FilterResult {
+function filterCSVData(csvData: CSVText): CSVText {
   const lines = csvData.split("\n").filter((line) => line.trim());
-
-  if (lines.length < 1) {
-    return { type: "error" };
-  }
-
   const headers = lines[0];
   const dataLines = lines.slice(1);
 
@@ -38,24 +25,28 @@ function filterCSVData(csvData: CSVText): FilterResult {
     return hasOutgoing && isNotExcluded;
   });
 
-  return {
-    type: "success",
-    filteredCSV: [headers, ...filteredLines].join("\n"),
-  };
+  return [headers, ...filteredLines].join("\n");
 }
 
 export function useCSVFilter(csvData: CSVText) {
   const [filteredData, setFilteredData] = useState<CSVText>("");
+  const { setMessage } = useMessage();
 
-  const filter = (): { type: "success" } | { type: "error" } => {
-    const result = filterCSVData(csvData);
-
-    if (result.type === "error") {
-      return { type: "error" };
+  const filter = (): void => {
+    if (!csvData.trim()) {
+      setMessage("CSVファイルをアップロードしてください");
+      return;
     }
 
-    setFilteredData(result.filteredCSV);
-    return { type: "success" };
+    const lines = csvData.split("\n").filter((line) => line.trim());
+    if (lines.length < 1) {
+      setMessage("データが不足しています");
+      return;
+    }
+
+    const filteredCSV = filterCSVData(csvData);
+    setFilteredData(filteredCSV);
+    setMessage("✓ フィルタリング完了");
   };
 
   return {

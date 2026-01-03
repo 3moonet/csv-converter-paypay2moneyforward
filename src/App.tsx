@@ -1,60 +1,15 @@
-import { useState } from "react";
 import { Download } from "lucide-react";
-import { MESSAGES } from "./constants/filterRules";
+import { MessageContextProvider } from "./contexts/MessageContext/provider";
+import { useMessage } from "./contexts/MessageContext/hooks";
 import { useFileUpload } from "./hooks/useFileUpload";
 import { useCSVFilter } from "./hooks/useCSVFilter";
 import { useCSVDownload } from "./hooks/useCSVDownload";
 
-export default function CSVFilter() {
-  const { csvData, handleFileUpload: handleFileUploadBase } = useFileUpload();
-  const { filteredData, filter: filterBase } = useCSVFilter(csvData);
-  const { isDownloading, download: downloadBase } = useCSVDownload();
-  const [message, setMessage] = useState("");
-
-  const handleFileUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const result = await handleFileUploadBase(event);
-    if (result?.type === "error") {
-      setMessage(MESSAGES.FILE.LOAD_ERROR);
-      return;
-    }
-    if (result?.type === "success") {
-      setMessage(MESSAGES.FILE.LOADED);
-    }
-  };
-
-  const filterCSV = () => {
-    if (!csvData.trim()) {
-      setMessage(MESSAGES.FILTER.NO_FILE);
-      return;
-    }
-
-    const result = filterBase();
-
-    if (result.type === "error") {
-      setMessage(MESSAGES.FILTER.INSUFFICIENT_DATA);
-      return;
-    }
-
-    setMessage(MESSAGES.FILTER.SUCCESS);
-  };
-
-  const handleDownload = () => {
-    if (!filteredData.trim()) {
-      setMessage(MESSAGES.DOWNLOAD.NO_FILTERED_DATA);
-      return;
-    }
-
-    const result = downloadBase(filteredData);
-
-    if (result.type === "error") {
-      setMessage(MESSAGES.DOWNLOAD.ERROR);
-      return;
-    }
-
-    setMessage(MESSAGES.DOWNLOAD.STARTED);
-  };
+function CSVFilterContent() {
+  const { csvData, handleFileUpload } = useFileUpload();
+  const { filteredData, filter } = useCSVFilter(csvData);
+  const { isDownloading, download } = useCSVDownload();
+  const { message } = useMessage();
 
   return (
     <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 p-4 flex items-center justify-center">
@@ -77,7 +32,7 @@ export default function CSVFilter() {
 
         {/* フィルタリングボタン */}
         <button
-          onClick={filterCSV}
+          onClick={filter}
           disabled={!csvData.trim()}
           className={`w-full font-bold py-2 px-4 rounded-md transition ${
             csvData.trim()
@@ -91,7 +46,7 @@ export default function CSVFilter() {
         {/* ダウンロードボタン */}
         {filteredData && (
           <button
-            onClick={handleDownload}
+            onClick={() => download(filteredData)}
             disabled={isDownloading}
             className="w-full bg-green-600 hover:bg-green-700 active:bg-green-800 disabled:bg-gray-400 text-white font-bold py-2 px-4 rounded-md transition flex items-center justify-center gap-2"
           >
@@ -139,5 +94,13 @@ export default function CSVFilter() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CSVFilter() {
+  return (
+    <MessageContextProvider>
+      <CSVFilterContent />
+    </MessageContextProvider>
   );
 }

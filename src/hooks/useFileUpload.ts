@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { CSVText } from "../types/csv";
+import { useMessage } from "../contexts/MessageContext/hooks";
 
 type ReadFileResult =
   | {
@@ -33,10 +34,11 @@ function readFileAsText(file: File): Promise<ReadFileResult> {
 
 export function useFileUpload() {
   const [csvData, setCsvData] = useState<CSVText>("");
+  const { setMessage } = useMessage();
 
   const handleFileUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
-  ): Promise<{ type: "success" } | { type: "error" } | void> => {
+  ): Promise<void> => {
     const file = event.target.files?.[0];
     if (!file) {
       return;
@@ -45,11 +47,12 @@ export function useFileUpload() {
     const result = await readFileAsText(file);
 
     if (result.type === "error") {
-      return { type: "error" };
+      setMessage("ファイルを読み込めませんでした");
+      return;
     }
 
     setCsvData(result.content);
-    return { type: "success" };
+    setMessage("ファイルを読み込みました");
   };
 
   return {
