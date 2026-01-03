@@ -3,7 +3,6 @@ import type { CSVText } from "../types/csv";
 import { useMessage } from "../contexts/MessageContext/hooks";
 
 const DOWNLOAD_CONFIG = {
-  FILENAME: "filtered_transactions.csv",
   BOM: "\uFEFF",
   MIME_TYPE: "text/csv;charset=utf-8;",
 } as const;
@@ -27,10 +26,26 @@ function triggerDownload(link: HTMLAnchorElement): void {
   document.body.removeChild(link);
 }
 
+function padZero(value: number): string {
+  return value.toString().padStart(2, "0");
+}
+
+function generateFilename(): string {
+  const now = new Date();
+  const year = now.getUTCFullYear();
+  const month = padZero(now.getUTCMonth() + 1);
+  const date = padZero(now.getUTCDate());
+  const hours = padZero(now.getUTCHours());
+  const minutes = padZero(now.getUTCMinutes());
+  const seconds = padZero(now.getUTCSeconds());
+  return `filtered_transactions_${year}${month}${date}${hours}${minutes}${seconds}.csv`;
+}
+
 function downloadCSV(csvData: CSVText): void {
   const blob = createBlobWithBOM(csvData);
   const url = URL.createObjectURL(blob);
-  const link = createDownloadLink(url, DOWNLOAD_CONFIG.FILENAME);
+  const filename = generateFilename();
+  const link = createDownloadLink(url, filename);
   triggerDownload(link);
   URL.revokeObjectURL(url);
 }
