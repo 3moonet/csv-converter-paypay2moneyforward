@@ -4,10 +4,10 @@ import type { CSVText } from "./types/csv";
 import { MESSAGES } from "./constants/filterRules";
 import { filterCSVData } from "./utils/csvFilter";
 import { downloadCSV } from "./utils/csvDownload";
-import { readFileAsText } from "./utils/fileReader";
+import { useFileUpload } from "./hooks/useFileUpload";
 
 export default function CSVFilter() {
-  const [csvData, setCsvData] = useState<CSVText>("");
+  const { csvData, handleFileUpload: handleFileUploadBase } = useFileUpload();
   const [filteredData, setFilteredData] = useState<CSVText>("");
   const [message, setMessage] = useState("");
   const [isDownloading, setIsDownloading] = useState(false);
@@ -15,20 +15,14 @@ export default function CSVFilter() {
   const handleFileUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const file = event.target.files?.[0];
-    if (!file) {
-      return;
-    }
-
-    const result = await readFileAsText(file);
-
-    if (result.type === "error") {
+    const result = await handleFileUploadBase(event);
+    if (result?.type === "error") {
       setMessage(MESSAGES.FILE.LOAD_ERROR);
       return;
     }
-
-    setCsvData(result.content);
-    setMessage(MESSAGES.FILE.LOADED);
+    if (result?.type === "success") {
+      setMessage(MESSAGES.FILE.LOADED);
+    }
   };
 
   const filterCSV = () => {
