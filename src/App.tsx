@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { Download } from "lucide-react";
 import { MESSAGES } from "./constants/filterRules";
-import { downloadCSV } from "./utils/csvDownload";
 import { useFileUpload } from "./hooks/useFileUpload";
 import { useCSVFilter } from "./hooks/useCSVFilter";
+import { useCSVDownload } from "./hooks/useCSVDownload";
 
 export default function CSVFilter() {
   const { csvData, handleFileUpload: handleFileUploadBase } = useFileUpload();
   const { filteredData, filter: filterBase } = useCSVFilter(csvData);
+  const { isDownloading, download: downloadBase } = useCSVDownload();
   const [message, setMessage] = useState("");
-  const [isDownloading, setIsDownloading] = useState(false);
 
   const handleFileUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -46,17 +46,14 @@ export default function CSVFilter() {
       return;
     }
 
-    setIsDownloading(true);
-    const result = downloadCSV(filteredData);
+    const result = downloadBase(filteredData);
 
     if (result.type === "error") {
       setMessage(MESSAGES.DOWNLOAD.ERROR);
-      setIsDownloading(false);
       return;
     }
 
     setMessage(MESSAGES.DOWNLOAD.STARTED);
-    setIsDownloading(false);
   };
 
   return (
