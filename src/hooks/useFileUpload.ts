@@ -17,21 +17,14 @@ function readFileAsText(file: File): Promise<ReadFileResult> {
     reader.onload = (e) => {
       const text = e.target?.result;
       if (typeof text === "string") {
-        resolve({
-          type: "success",
-          content: text,
-        });
+        resolve({ type: "success", content: text });
       } else {
-        resolve({
-          type: "error",
-        });
+        resolve({ type: "error" });
       }
     };
 
     reader.onerror = () => {
-      resolve({
-        type: "error",
-      });
+      resolve({ type: "error" });
     };
 
     reader.readAsText(file, "utf-8");
@@ -43,10 +36,10 @@ export function useFileUpload() {
 
   const handleFileUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
-  ): Promise<{ type: "success" } | { type: "error" } | undefined> => {
+  ): Promise<{ type: "success" } | { type: "error" } | void> => {
     const file = event.target.files?.[0];
     if (!file) {
-      return undefined;
+      return;
     }
 
     const result = await readFileAsText(file);

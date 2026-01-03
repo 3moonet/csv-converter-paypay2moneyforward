@@ -20,9 +20,7 @@ function filterCSVData(csvData: CSVText): FilterResult {
   const lines = csvData.split("\n").filter((line) => line.trim());
 
   if (lines.length < 1) {
-    return {
-      type: "error",
-    };
+    return { type: "error" };
   }
 
   const headers = lines[0];
@@ -40,11 +38,9 @@ function filterCSVData(csvData: CSVText): FilterResult {
     return hasOutgoing && isNotExcluded;
   });
 
-  const filteredCSV = [headers, ...filteredLines].join("\n");
-
   return {
     type: "success",
-    filteredCSV,
+    filteredCSV: [headers, ...filteredLines].join("\n"),
   };
 }
 
@@ -52,10 +48,6 @@ export function useCSVFilter(csvData: CSVText) {
   const [filteredData, setFilteredData] = useState<CSVText>("");
 
   const filter = (): { type: "success" } | { type: "error" } => {
-    if (!csvData.trim()) {
-      return { type: "error" };
-    }
-
     const result = filterCSVData(csvData);
 
     if (result.type === "error") {

@@ -22,8 +22,8 @@ function createBlobWithBOM(csvData: CSVText): Blob {
 
 function createDownloadLink(url: string, filename: string): HTMLAnchorElement {
   const link = document.createElement("a");
-  link.setAttribute("href", url);
-  link.setAttribute("download", filename);
+  link.href = url;
+  link.download = filename;
   link.style.visibility = "hidden";
   return link;
 }
@@ -37,9 +37,7 @@ function triggerDownload(link: HTMLAnchorElement, url: string): void {
 
 function downloadCSV(csvData: CSVText): DownloadResult {
   if (!csvData.trim()) {
-    return {
-      type: "error",
-    };
+    return { type: "error" };
   }
 
   const blob = createBlobWithBOM(csvData);
@@ -47,9 +45,7 @@ function downloadCSV(csvData: CSVText): DownloadResult {
   const link = createDownloadLink(url, DOWNLOAD_CONFIG.FILENAME);
   triggerDownload(link, url);
 
-  return {
-    type: "success",
-  };
+  return { type: "success" };
 }
 
 export function useCSVDownload() {
@@ -58,14 +54,9 @@ export function useCSVDownload() {
   const download = (
     csvData: CSVText
   ): { type: "success" } | { type: "error" } => {
-    if (!csvData.trim()) {
-      return { type: "error" };
-    }
-
     setIsDownloading(true);
     const result = downloadCSV(csvData);
     setIsDownloading(false);
-
     return result;
   };
 
