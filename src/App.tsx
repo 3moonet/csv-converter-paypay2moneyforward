@@ -1,10 +1,7 @@
 import { useState } from "react";
 import { Download } from "lucide-react";
-import {
-  FILTER_RULES,
-  MESSAGES,
-  DOWNLOAD_CONFIG,
-} from "./constants/filterRules";
+import { MESSAGES, DOWNLOAD_CONFIG } from "./constants/filterRules";
+import { filterCSVData } from "./utils/csvFilter";
 
 export default function CSVFilter() {
   const [csvData, setCsvData] = useState("");
@@ -35,35 +32,15 @@ export default function CSVFilter() {
       return;
     }
 
-    try {
-      const lines = csvData.split("\n").filter((line) => line.trim());
+    const result = filterCSVData(csvData);
 
-      if (lines.length < 1) {
-        setMessage(MESSAGES.FILTER.INSUFFICIENT_DATA);
-        return;
-      }
-
-      const headers = lines[0];
-      const dataLines = lines.slice(1);
-
-      const filteredLines = dataLines.filter((line) => {
-        const columns = line.split(",");
-        const outgoingValue = columns[FILTER_RULES.OUTGOING_COLUMN_INDEX];
-        const hasOutgoing =
-          outgoingValue &&
-          !FILTER_RULES.EMPTY_VALUES.includes(outgoingValue.trim());
-        const isNotExcluded = !FILTER_RULES.EXCLUDE_PATTERNS.some((pattern) =>
-          line.includes(pattern)
-        );
-        return hasOutgoing && isNotExcluded;
-      });
-
-      const result = [headers, ...filteredLines].join("\n");
-      setFilteredData(result);
-      setMessage(MESSAGES.FILTER.SUCCESS(filteredLines.length));
-    } catch {
-      setMessage(MESSAGES.FILTER.ERROR);
+    if (result.type === "error") {
+      setMessage(MESSAGES.FILTER.INSUFFICIENT_DATA);
+      return;
     }
+
+    setFilteredData(result.filteredCSV);
+    setMessage(MESSAGES.FILTER.SUCCESS(result.filteredCount));
   };
 
   const downloadCSV = () => {

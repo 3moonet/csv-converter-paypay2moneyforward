@@ -1,9 +1,3 @@
-export const FILTER_RULES = {
-  EXCLUDE_PATTERNS: ["PayPayポイント運用", "PayPay残高"] as const,
-  OUTGOING_COLUMN_INDEX: 1,
-  EMPTY_VALUES: ["-", ""] as readonly string[],
-} as const;
-
 export const MESSAGES = {
   FILE: {
     LOADED: "ファイルを読み込みました",
