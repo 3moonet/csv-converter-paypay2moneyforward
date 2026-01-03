@@ -10,8 +10,6 @@ type FilterResult =
   | {
       type: "success";
       filteredCSV: CSVText;
-      filteredCount: number;
-      originalCount: number;
     }
   | {
       type: "error";
@@ -46,7 +44,5 @@ export function filterCSVData(csvData: CSVText): FilterResult {
   return {
     type: "success",
     filteredCSV,
-    filteredCount: filteredLines.length,
-    originalCount: dataLines.length,
   };
 }

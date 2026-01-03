@@ -6,7 +6,7 @@ export const MESSAGES = {
   FILTER: {
     NO_FILE: "CSVファイルをアップロードしてください",
     INSUFFICIENT_DATA: "データが不足しています",
-    SUCCESS: (count: number) => `✓ フィルタリング完了: ${count}行抽出`,
+    SUCCESS: "✓ フィルタリング完了",
     ERROR: "エラーが発生しました",
   },
   DOWNLOAD: {
