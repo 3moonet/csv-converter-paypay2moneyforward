@@ -8,7 +8,6 @@ import { FilterButton } from "./components/FilterButton";
 import { DownloadButton } from "./components/DownloadButton";
 import { MessageDisplay } from "./components/MessageDisplay";
 import { Statistics } from "./components/Statistics";
-import { FilterInfo } from "./components/FilterInfo";
 import type { FilterSettings as FilterSettingsType } from "./types/filter";
 import { DEFAULT_FILTER_SETTINGS } from "./types/filter";
 
@@ -26,11 +25,6 @@ function CSVFilterContent() {
 
         <FileUpload onFileUpload={handleFileUpload} />
 
-        <FilterSettings
-          filterSettings={filterSettings}
-          setFilterSettings={setFilterSettings}
-        />
-
         <FilterButton onClick={filter} disabled={!csvData.trim()} />
 
         {filteredData && <DownloadButton filteredData={filteredData} />}
@@ -39,7 +33,10 @@ function CSVFilterContent() {
 
         <Statistics csvData={csvData} filteredData={filteredData} />
 
-        <FilterInfo filterSettings={filterSettings} />
+        <FilterSettings
+          filterSettings={filterSettings}
+          setFilterSettings={setFilterSettings}
+        />
       </div>
     </div>
   );
