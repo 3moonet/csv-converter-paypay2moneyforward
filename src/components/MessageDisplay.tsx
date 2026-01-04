@@ -1,3 +1,4 @@
+import type { MessageType } from "../types/message";
 import { useMessage } from "../contexts/MessageContext/hooks";
 
 export function MessageDisplay() {
@@ -7,15 +8,14 @@ export function MessageDisplay() {
     return null;
   }
 
+  const styles: Record<MessageType, string> = {
+    success: "bg-green-100 text-green-800 border border-green-300",
+    info: "bg-blue-100 text-blue-800 border border-blue-300",
+  };
+
   return (
-    <div
-      className={`p-3 rounded-md text-sm font-medium text-center ${
-        message.includes("✓")
-          ? "bg-green-100 text-green-800 border border-green-300"
-          : "bg-blue-100 text-blue-800 border border-blue-300"
-      }`}
-    >
-      {message}
+    <div className={`p-3 rounded-md text-sm font-medium text-center ${styles[message.type]}`}>
+      {message.content}
     </div>
   );
 }

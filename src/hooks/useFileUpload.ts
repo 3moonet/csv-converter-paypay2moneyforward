@@ -47,12 +47,12 @@ export function useFileUpload() {
     const result = await readFileAsText(file);
 
     if (result.type === "error") {
-      setMessage("ファイルを読み込めませんでした");
+      setMessage({ content: "ファイルを読み込めませんでした", type: "info" });
       return;
     }
 
     setCsvData(result.content);
-    setMessage("ファイルを読み込みました");
+    setMessage({ content: "ファイルを読み込みました", type: "info" });
   };
 
   return {

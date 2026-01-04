@@ -56,14 +56,14 @@ export function useCSVDownload() {
 
   const download = (csvData: CSVText): void => {
     if (!csvData.trim()) {
-      setMessage("まずフィルタリングを実行してください");
+      setMessage({ content: "まずフィルタリングを実行してください", type: "info" });
       return;
     }
 
     setIsDownloading(true);
     downloadCSV(csvData);
     setIsDownloading(false);
-    setMessage("✓ ダウンロード開始しました");
+    setMessage({ content: "ダウンロード開始しました", type: "success" });
   };
 
   return {

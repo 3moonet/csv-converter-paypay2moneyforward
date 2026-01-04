@@ -34,19 +34,19 @@ export function useCSVFilter(csvData: CSVText) {
 
   const filter = (): void => {
     if (!csvData.trim()) {
-      setMessage("CSVファイルをアップロードしてください");
+      setMessage({ content: "CSVファイルをアップロードしてください", type: "info" });
       return;
     }
 
     const lines = csvData.split("\n").filter((line) => line.trim());
     if (lines.length < 1) {
-      setMessage("データが不足しています");
+      setMessage({ content: "データが不足しています", type: "info" });
       return;
     }
 
     const filteredCSV = filterCSVData(csvData);
     setFilteredData(filteredCSV);
-    setMessage("✓ フィルタリング完了");
+    setMessage({ content: "フィルタリング完了", type: "success" });
   };
 
   return {
