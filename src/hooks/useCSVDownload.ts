@@ -56,7 +56,7 @@ export function useCSVDownload() {
 
   const download = (csvData: CSVText): void => {
     if (!csvData.trim()) {
-      setMessage({ content: "まずフィルタリングを実行してください", type: "info" });
+      setMessage({ content: "まずフィルタリングを実行してください", type: "error" });
       return;
     }
 

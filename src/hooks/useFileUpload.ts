@@ -47,7 +47,7 @@ export function useFileUpload() {
     const result = await readFileAsText(file);
 
     if (result.type === "error") {
-      setMessage({ content: "ファイルを読み込めませんでした", type: "info" });
+      setMessage({ content: "ファイルを読み込めませんでした", type: "error" });
       return;
     }
 

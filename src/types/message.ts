@@ -1,4 +1,4 @@
-export type MessageType = "success" | "info";
+export type MessageType = "success" | "info" | "error";
 
 export interface Message {
   content: string;
