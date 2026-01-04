@@ -21,7 +21,10 @@ function CSVFilterContent() {
   return (
     <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 p-4 flex items-center justify-center">
       <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-6 space-y-6">
-        <h1 className="text-2xl font-bold text-gray-800">CSV フィルター</h1>
+        <div className="space-y-2">
+          <h1 className="text-2xl font-bold text-gray-800">MoneyForward 用 PayPay CSV 変換ツール</h1>
+          <p className="text-sm text-gray-600">PayPay 取引履歴を MoneyForward 形式に変換します。100行制限に合わせて自動で分割します</p>
+        </div>
 
         <FileUpload onFileUpload={handleFileUpload} />
 
