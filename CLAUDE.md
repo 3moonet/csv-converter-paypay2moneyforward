@@ -12,17 +12,14 @@ PayPay の取引履歴 CSV ファイルを MoneyForward で読み込める形式
 # 開発サーバーの起動
 pnpm dev
 
-# ビルド（TypeScript コンパイル + Vite ビルド）
-pnpm build
-
 # 型チェック
 pnpm typecheck
 
 # リント
 pnpm lint
 
-# プレビューサーバーの起動（ビルド後）
-pnpm preview
+# ビルド（TypeScript コンパイル + Vite ビルド）
+pnpm build
 
 # Playwright 関連ファイルのクリーンアップ
 pnpm clean:playwright
