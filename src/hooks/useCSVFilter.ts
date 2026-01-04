@@ -1,34 +1,55 @@
 import { useState } from "react";
 import type { CSVText } from "../types/csv";
+import type { FilterSettings } from "../types/filter";
 import { useMessage } from "../contexts/MessageContext/hooks";
 
 const FILTER_RULES = {
-  EXCLUDE_PATTERNS: ["PayPayポイント運用", "PayPay残高"] as const,
+  EXCLUDE_PATTERNS: {
+    POINT_OPERATION: "PayPayポイント運用",
+    BALANCE: "PayPay残高",
+  },
   OUTGOING_COLUMN_INDEX: 1,
   EMPTY_VALUES: ["-", ""] as readonly string[],
 } as const;
 
-function filterCSVData(csvData: CSVText): CSVText {
+function filterCSVData(csvData: CSVText, filterSettings: FilterSettings): CSVText {
   const lines = csvData.split("\n").filter((line) => line.trim());
   const headers = lines[0];
   const dataLines = lines.slice(1);
 
   const filteredLines = dataLines.filter((line) => {
     const columns = line.split(",");
-    const outgoingValue = columns[FILTER_RULES.OUTGOING_COLUMN_INDEX];
-    const hasOutgoing =
-      outgoingValue &&
-      !FILTER_RULES.EMPTY_VALUES.includes(outgoingValue.trim());
-    const isNotExcluded = !FILTER_RULES.EXCLUDE_PATTERNS.some((pattern) =>
-      line.includes(pattern)
-    );
-    return hasOutgoing && isNotExcluded;
+
+    // 出金列フィルタ
+    if (filterSettings.enableOutgoingFilter) {
+      const outgoingValue = columns[FILTER_RULES.OUTGOING_COLUMN_INDEX];
+      const hasOutgoing =
+        outgoingValue &&
+        !FILTER_RULES.EMPTY_VALUES.includes(outgoingValue.trim());
+      if (!hasOutgoing) return false;
+    }
+
+    // ポイント運用除外
+    if (filterSettings.enablePointOperationExclude) {
+      if (line.includes(FILTER_RULES.EXCLUDE_PATTERNS.POINT_OPERATION)) {
+        return false;
+      }
+    }
+
+    // 残高除外
+    if (filterSettings.enableBalanceExclude) {
+      if (line.includes(FILTER_RULES.EXCLUDE_PATTERNS.BALANCE)) {
+        return false;
+      }
+    }
+
+    return true;
   });
 
   return [headers, ...filteredLines].join("\n");
 }
 
-export function useCSVFilter(csvData: CSVText) {
+export function useCSVFilter(csvData: CSVText, filterSettings: FilterSettings) {
   const [filteredData, setFilteredData] = useState<CSVText>("");
   const { setMessage } = useMessage();
 
@@ -44,7 +65,7 @@ export function useCSVFilter(csvData: CSVText) {
       return;
     }
 
-    const filteredCSV = filterCSVData(csvData);
+    const filteredCSV = filterCSVData(csvData, filterSettings);
     setFilteredData(filteredCSV);
     setMessage({ content: "フィルタリング完了", type: "success" });
   };
